@@ -70,37 +70,16 @@ export default function MemorialLetterModal({
       const fileName = `จดหมายถึงโลกใบเดิม-${user?.name || "บันทึก"}.png`;
       const res = await fetch(dataUrl);
       const blob = await res.blob();
-
-      // Mobile Web Share API support
-      const file = new File([blob], fileName, { type: "image/png" });
-      if (
-        typeof navigator !== "undefined" &&
-        navigator.canShare &&
-        navigator.canShare({ files: [file] })
-      ) {
-        try {
-          await navigator.share({
-            files: [file],
-            title: "จดหมายถึงโลกใบเดิม",
-            text: "ถ้อยคำสุดท้ายในห้วงเวลาจำลอง 5 นาทีก่อนจากลา — Can I Have 5 Minutes",
-          });
-          return;
-        } catch (shareErr) {
-          if ((shareErr as Error).name === "AbortError") {
-            return;
-          }
-        }
-      }
-
-      // Standard desktop download fallback
       const blobUrl = URL.createObjectURL(blob);
+
+      // Direct file download to user's device (Downloads folder)
       const link = document.createElement("a");
       link.download = fileName;
       link.href = blobUrl;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 3000);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
     } catch (err) {
       console.error("Failed to generate image", err);
       alert("ไม่สามารถสร้างรูปภาพได้ในขณะนี้ กรุณาใช้ปุ่มคัดลอกข้อความแทนครับ");
