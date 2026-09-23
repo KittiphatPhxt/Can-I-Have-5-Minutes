@@ -134,7 +134,6 @@ export default function IntroPage() {
                       onChange={(e) => setName(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleNext()}
                       placeholder="แตะเพื่อพิมพ์ชื่อหรือนามแฝง..."
-                      autoFocus
                       className="w-full bg-surface/50 border-b border-white/20 focus:border-gold focus:bg-surface/80 focus:outline-none py-3 px-4 text-base sm:text-lg text-center transition-all duration-300 font-sans text-white placeholder:text-ink-faint/50 rounded-t-lg"
                     />
                   </motion.div>
@@ -158,7 +157,6 @@ export default function IntroPage() {
                       placeholder="ระบุอายุของคุณ เช่น 25"
                       min="1"
                       max="120"
-                      autoFocus
                       className="w-full bg-surface/50 border-b border-white/20 focus:border-gold focus:bg-surface/80 focus:outline-none py-3 px-4 text-base sm:text-lg text-center transition-all duration-300 font-sans text-white placeholder:text-ink-faint/50 rounded-t-lg"
                     />
                   </motion.div>
