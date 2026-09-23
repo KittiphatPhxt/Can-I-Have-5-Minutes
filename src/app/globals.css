@@ -2,59 +2,105 @@
 
 /* 1. ตั้งค่า Theme สำหรับ Tailwind v4 */
 @theme {
-  --font-serif: "Cormorant Garamond", serif;
-  --font-sans: "DM Sans", sans-serif;
+  --font-serif: "Prompt", "Plus Jakarta Sans", sans-serif;
+  --font-sans: "Prompt", "Plus Jakarta Sans", sans-serif;
   --font-mono: "DM Mono", monospace;
 
-  --color-bg: #0a0a0a;
-  --color-surface: #111111;
+  --color-bg: #09090a;
+  --color-surface: #121214;
+  --color-surface-hover: #1c1c20;
   --color-gold: #c8a96e;
-  --color-gold-dim: #8a6f3f;
-  --color-ink-muted: #888888;
-  --color-ink-faint: #444444;
-  --color-border: #2a2a2a;
+  --color-gold-light: #e5cd9b;
+  --color-gold-dim: #8e7448;
+  --color-ink-muted: #9aa0a6;
+  --color-ink-faint: #4e5257;
+  --color-border: #222328;
+  --color-border-glow: rgba(200, 169, 110, 0.3);
 
   --animate-fade-in: fadeIn 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-/* 2. Keyframes สำหรับการ Fade-in */
+/* 2. Keyframes สำหรับการ Fade-in & Motion */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* 3. Base Styles และการซ่อน Scrollbar */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes subtlePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+
+/* 3. Base Styles และ Typography ภาษาไทยที่อ่านง่าย สบายตา */
 @layer base {
-  html, body {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    color-scheme: dark;
+  }
+
+  body {
     @apply bg-bg text-[#e8e8e8] font-sans antialiased selection:bg-gold selection:text-black;
+    line-height: 1.75;
+    letter-spacing: -0.01em;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     
-    /* ซ่อน Scrollbar สำหรับ Chrome, Safari และ Edge */
+    /* ซ่อน Scrollbar ทุกแพลตฟอร์ม ทั่วทั้งเว็บไซต์ */
     &::-webkit-scrollbar {
       display: none;
     }
-    
-    /* ซ่อน Scrollbar สำหรับ Firefox และ IE/Edge รุ่นเก่า */
     -ms-overflow-style: none;
     scrollbar-width: none;
     
     /* ป้องกันการเลื่อนที่สั่นไหว */
     overflow-x: hidden;
   }
+
+  /* ซ่อน Scrollbar สำหรับทุกคอนเทนเนอร์ */
+  *::-webkit-scrollbar {
+    display: none;
+  }
+  * {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.45;
+  }
+
+  p {
+    line-height: 1.8;
+  }
 }
 
 /* 4. Utility Classes */
-.delay-1 { animation-delay: 2s; }
-.delay-2 { animation-delay: 4s; }
-.delay-3 { animation-delay: 5.5s; }
+.delay-1 { animation-delay: 1.5s; }
+.delay-2 { animation-delay: 3s; }
+.delay-3 { animation-delay: 4.5s; }
 .fill-mode-both { animation-fill-mode: both; }
 
-/* Custom Grid สำหรับ Simulation (15 คอลัมน์) */
-.grid-cols-15 { 
-  display: grid;
-  grid-template-columns: repeat(15, minmax(0, 1fr)); 
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
 
-/* ซ่อนหัวลูกศรใน input type="number" (เพื่อความสวยงาม) */
+.animate-subtle-pulse {
+  animation: subtlePulse 8s ease-in-out infinite;
+}
+
+/* ซ่อนหัวลูกศรใน input type="number" */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -64,10 +110,20 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+/* Custom Grid สำหรับ Simulation (10 คอลัมน์ = 1 แถวละ 10 ปี / 1 ทศวรรษ) */
+.grid-cols-10 {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
 }
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+
+/* Glassmorphism และ Glow */
+.glass-panel {
+  background: rgba(18, 18, 20, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.gold-glow {
+  box-shadow: 0 0 35px rgba(200, 169, 110, 0.15);
 }

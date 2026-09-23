@@ -20,17 +20,18 @@ export default function IntroPage() {
   const handleAccept = () => {
     setShowWarning(false);
     playMusic();
-    setTimeout(() => setIsAccepted(true), 800);
+    setTimeout(() => setIsAccepted(true), 600);
   };
 
   const handleNext = () => {
-    if (step === 1 && name.trim()) setStep(2);
-    else if (step === 2 && age.trim()) {
-      const ageNum = parseInt(age);
+    if (step === 1 && name.trim()) {
+      setStep(2);
+    } else if (step === 2 && age.trim()) {
+      const ageNum = parseInt(age, 10);
       if (!isNaN(ageNum) && ageNum > 0) {
         localStorage.setItem(
           "ci5m_user",
-          JSON.stringify({ name, age: ageNum }),
+          JSON.stringify({ name: name.trim(), age: ageNum })
         );
         router.push("/simulation");
       }
@@ -41,227 +42,228 @@ export default function IntroPage() {
     initial: { opacity: 0 },
     animate: {
       opacity: 1,
-      transition: { staggerChildren: 1.2, delayChildren: 0.2 },
+      transition: { staggerChildren: 0.9, delayChildren: 0.2 },
     },
   };
 
   const itemVars: Variants = {
-    initial: { opacity: 0, y: 10 },
+    initial: { opacity: 0, y: 12 },
     animate: {
       opacity: 1,
       y: 0,
-      transition: { 
-        duration: 1.5, 
-        ease: [0, 0, 0.58, 1] 
+      transition: {
+        duration: 1.2,
+        ease: [0.25, 0.1, 0.25, 1],
       },
     },
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-bg flex flex-col items-center justify-center overflow-hidden font-sans antialiased">
+    <div className="relative min-h-screen min-h-[100dvh] w-full bg-bg flex flex-col items-center justify-center overflow-x-hidden font-sans antialiased px-4 sm:px-6">
       {/* 🌑 Background Effects */}
       <div
         className="pointer-events-none fixed inset-0 z-20"
         style={{
-          background: `radial-gradient(circle at center, transparent 10%, black 140%)`,
-          opacity: 0.8,
+          background: `radial-gradient(circle at center, transparent 15%, black 140%)`,
+          opacity: 0.85,
         }}
       />
-      <div className="pointer-events-none fixed inset-0 z-10 animate-flicker opacity-20">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[700px] md:h-[700px] bg-gold-dim rounded-full blur-[100px] md:blur-[180px]" />
+      <div className="pointer-events-none fixed inset-0 z-10 animate-subtle-pulse opacity-25">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] sm:w-[450px] sm:h-[450px] md:w-[650px] md:h-[650px] bg-gold-dim rounded-full blur-[100px] md:blur-[160px]" />
       </div>
 
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {isAccepted && (
           <motion.div
             key="main-content"
             variants={containerVars}
             initial="initial"
             animate="animate"
-            className="relative z-30 flex flex-col items-center justify-between px-6 text-center max-w-2xl mx-auto w-full py-12 md:py-24 min-h-[90vh] md:min-h-[85vh]"
+            className="relative z-30 flex flex-col items-center justify-between text-center max-w-xl mx-auto w-full py-10 md:py-16 min-h-[85vh] md:min-h-[80vh]"
           >
-            <div className="flex flex-col items-center w-full mt-6 md:mt-10">
-              <motion.p
+            {/* บทกวีนำทาง */}
+            <div className="flex flex-col items-center w-full my-auto px-2">
+              <motion.h1
                 variants={itemVars}
-                className="text-xl md:text-4xl text-white font-serif font-light tracking-[0.1em] md:tracking-[0.15em] mb-12 md:mb-20"
+                className="text-2xl sm:text-3xl md:text-4xl text-white font-sans font-medium tracking-wide leading-relaxed mb-6 md:mb-10 drop-shadow-[0_2px_12px_rgba(200,169,110,0.15)]"
               >
                 &quot;ขอเวลาสัก 5 นาที... ได้ไหม?&quot;
-              </motion.p>
-              
+              </motion.h1>
+
               <motion.div
                 variants={itemVars}
-                className="space-y-6 md:space-y-8 text-ink-muted/80 font-serif italic animate-pulse-breathing"
+                className="space-y-3.5 sm:space-y-5 text-ink-muted font-sans text-base sm:text-lg md:text-xl leading-relaxed max-w-lg mx-auto"
               >
-                <p className="text-lg md:text-2xl leading-relaxed tracking-wide">
-                  เมื่อแสงตะวันลับขอบฟ้า... ชั่วนิรันดร์
-                </p>
-                <p className="text-lg md:text-2xl leading-relaxed tracking-wide">
-                  เหลือเพียงความฝัน... ที่ยังไม่กล้าเอ่ย
-                </p>
-                <p className="text-lg md:text-2xl leading-relaxed tracking-wide">
-                  แด่ความรู้สึก... ที่ละเลยตลอดมา
-                </p>
+                <p>หากวินาทีนี้... คือลมหายใจสุดท้ายของคุณบนโลกใบเดิม</p>
+                <p>โลกจะยังคงหมุนต่อไป โดยไม่มีคุณอีกแล้ว</p>
+                <p>เหลือทิ้งไว้เพียงความทรงจำ... และคำพูดที่คุณยังไม่เคยเอ่ยออกไป</p>
               </motion.div>
 
-              <motion.div variants={itemVars} className="mt-16 md:mt-20">
-                <p className="text-base md:text-l text-gold-dim font-medium tracking-[0.15em] md:tracking-[0.2em] leading-relaxed uppercase px-4">
-                  ในวินาทีที่ทุกอย่างสิ้นสุด...
+              <motion.div variants={itemVars} className="mt-8 md:mt-12 max-w-lg">
+                <p className="text-sm sm:text-base md:text-lg text-gold-light/90 font-sans leading-relaxed px-4">
+                  ก่อนที่แสงสุดท้ายจะมอดดับลงชั่วนิรันดร์...
                   <br />
-                  คุณจะเสียดายอะไรไหม?
+                  <span className="text-gold font-medium">คุณมีเรื่องอะไรที่เสียดายที่สุดหากไม่ได้พูดออกมา?</span>
                 </p>
               </motion.div>
             </div>
 
+            {/* ส่วนกรอกข้อมูล */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 5 }}
-              className="w-full flex flex-col items-center max-w-sm mt-auto pb-6"
+              transition={{ delay: 3.5, duration: 1 }}
+              className="w-full flex flex-col items-center max-w-sm mt-8 pt-4 pb-2"
             >
               <AnimatePresence mode="wait">
                 {step === 1 ? (
                   <motion.div
                     key="step1"
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 10 }}
-                    className="w-full"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.4 }}
+                    className="w-full space-y-3"
                   >
-                    <p className="text-ink-faint mb-4 text-[13px] md:text-[15px] tracking-[0.3em] md:tracking-[0.4em] uppercase font-mono opacity-60 font-semibold">
-                      นามของท่าน
-                    </p>
+                    <label className="block text-ink-muted text-xs sm:text-sm font-sans tracking-wide uppercase">
+                      นามของคุณ
+                    </label>
                     <input
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleNext()}
-                      placeholder="แตะเพื่อพิมพ์..."
-                      className="w-full bg-transparent border-b border-border/40 focus:border-gold focus:outline-none py-3 text-lg md:text-xl text-center transition-colors font-serif text-white/90 placeholder:opacity-20"
+                      placeholder="แตะเพื่อพิมพ์ชื่อหรือนามแฝง..."
+                      autoFocus
+                      className="w-full bg-surface/50 border-b border-white/20 focus:border-gold focus:bg-surface/80 focus:outline-none py-3 px-4 text-base sm:text-lg text-center transition-all duration-300 font-sans text-white placeholder:text-ink-faint/50 rounded-t-lg"
                     />
                   </motion.div>
                 ) : (
                   <motion.div
                     key="step2"
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 10 }}
-                    className="w-full"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.4 }}
+                    className="w-full space-y-3"
                   >
-                    <p className="text-ink-faint mb-4 text-[13px] md:text-[15px] tracking-[0.3em] md:tracking-[0.4em] uppercase font-mono opacity-60 font-semibold">
-                      อายุขัยของท่าน
-                    </p>
+                    <label className="block text-ink-muted text-xs sm:text-sm font-sans tracking-wide uppercase">
+                      อายุขัยของคุณ (ปี)
+                    </label>
                     <input
                       type="number"
                       value={age}
                       onChange={(e) => setAge(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleNext()}
-                      placeholder="0"
-                      className="w-full bg-transparent border-b border-border/40 focus:border-gold focus:outline-none py-3 text-lg md:text-xl text-center transition-colors font-serif text-white/90 placeholder:opacity-20"
+                      placeholder="ระบุอายุของคุณ เช่น 25"
+                      min="1"
+                      max="120"
+                      autoFocus
+                      className="w-full bg-surface/50 border-b border-white/20 focus:border-gold focus:bg-surface/80 focus:outline-none py-3 px-4 text-base sm:text-lg text-center transition-all duration-300 font-sans text-white placeholder:text-ink-faint/50 rounded-t-lg"
                     />
                   </motion.div>
                 )}
               </AnimatePresence>
+
               <button
                 onClick={handleNext}
-                className="mt-12 md:mt-16 text-gold-dim/60 hover:text-gold text-[11px] md:text-[13px] tracking-[0.4em] md:tracking-[0.5em] transition-all duration-1000 uppercase font-mono border-b border-transparent hover:border-gold pb-1 cursor-pointer"
+                disabled={step === 1 ? !name.trim() : !age.trim()}
+                className="mt-8 px-6 py-2.5 text-xs sm:text-sm tracking-widest text-gold hover:text-gold-light disabled:text-ink-faint disabled:opacity-40 transition-all duration-300 font-sans font-medium border-b border-transparent hover:border-gold cursor-pointer disabled:cursor-not-allowed group flex items-center gap-2"
               >
-                ก้าวข้ามผ่าน →
+                <span>ก้าวข้ามผ่าน</span>
+                <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
               </button>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
+      {/* Modal คำเตือนสุขภาพจิต */}
       <AnimatePresence>
         {showWarning && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.8 } }}
-            className="fixed inset-0 z-[100] flex items-center justify-center px-4 md:px-6 bg-black/80 backdrop-blur-md"
+            exit={{ opacity: 0, transition: { duration: 0.6 } }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-md overflow-hidden"
           >
             <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              initial={{ opacity: 0, y: 16, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.05, transition: { duration: 0.5 } }}
-              className="bg-surface border border-gold/30 p-6 md:p-12 rounded-2xl max-w-lg w-full relative overflow-hidden shadow-[0_0_60px_rgba(0,0,0,1)]"
+              exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.4 } }}
+              className="bg-surface/95 border border-gold/30 rounded-2xl max-w-lg w-full relative shadow-[0_0_60px_rgba(0,0,0,0.9)] max-h-[92dvh] overflow-hidden my-auto flex flex-col"
             >
-              <div className="absolute -top-24 -right-24 w-48 h-48 bg-gold/10 rounded-full blur-3xl" />
-              <div className="relative z-10 text-center space-y-6 md:space-y-8">
+              <div className="absolute -top-20 -right-20 w-44 h-44 bg-gold/10 rounded-full blur-3xl pointer-events-none" />
+
+              <div className="relative z-10 text-center space-y-5 sm:space-y-6 p-5 sm:p-8 md:p-10 overflow-y-auto overflow-x-hidden">
                 <div className="flex justify-center">
-                  <HeartPulse
-                    className="text-gold animate-pulse"
-                    size={48}
-                    md-size={56}
-                    strokeWidth={1}
-                  />
+                  <div className="p-3 bg-gold/10 rounded-full border border-gold/20">
+                    <HeartPulse className="text-gold animate-pulse w-8 h-8 sm:w-10 sm:h-10" strokeWidth={1.5} />
+                  </div>
                 </div>
-                <div className="space-y-3">
-                  <h3 className="text-xl md:text-3xl font-serif text-white tracking-wide">
+
+                <div className="space-y-2">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-sans text-white tracking-normal font-medium">
                     แด่หัวใจที่กำลังอ่อนล้า...
-                  </h3>
-                  <p className="text-xs md:text-base text-ink-muted font-serif italic leading-relaxed px-2">
+                  </h2>
+                  <p className="text-xs sm:text-sm md:text-base text-ink-muted font-sans leading-relaxed px-2">
                     &quot;ในคืนที่มืดมิดที่สุด แสงดาวจะสว่างที่สุดเสมอ <br />
                     โลกใบนี้ยังมีที่ว่าง สำหรับรอยยิ้มของคุณเสมอ&quot;
                   </p>
                 </div>
-                <div className="bg-black/40 p-5 md:p-8 rounded-xl border border-white/5 text-left space-y-4 md:space-y-5 text-[13px] md:text-base text-ink-muted/90 tracking-wide leading-relaxed">
-                  <p className="text-xs md:text-base opacity-80">
-                    หากคุณรู้สึกไม่สบายใจ เราอยากให้คุณรู้ว่ามีคนพร้อมจะรับฟังคุณเสมอ:
+
+                <div className="bg-black/50 p-4 sm:p-5 rounded-xl border border-white/5 text-left space-y-3 sm:space-y-4 text-xs sm:text-sm text-ink-muted leading-relaxed">
+                  <p className="opacity-90 font-sans">
+                    หากคุณกำลังเผชิญกับวันที่หนักหน่วง หรือรู้สึกไม่สบายใจ เราอยากให้คุณรู้ว่ามีคนพร้อมรับฟังคุณเสมอ:
                   </p>
-                  <div className="space-y-3 md:space-y-4 pt-1 md:pt-3">
+                  <div className="space-y-2.5 pt-1">
                     <a
                       href="tel:1323"
-                      className="flex items-center gap-3 md:gap-4 text-gold-dim hover:text-gold transition-all duration-300 group"
+                      className="flex items-center gap-3 p-2 rounded-lg bg-white/[0.02] hover:bg-gold/10 text-gold-light hover:text-gold transition-all duration-200 group border border-transparent hover:border-gold/20"
                     >
-                      <div className="p-1.5 md:p-2 bg-gold/5 rounded-full group-hover:bg-gold/10">
+                      <div className="p-2 bg-gold/10 rounded-md text-gold">
                         <Phone size={16} />
                       </div>
-                      <span className="font-mono text-sm md:text-lg tracking-widest">
-                        1323 สายด่วนสุขภาพจิต
-                      </span>
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+                        <span className="font-mono text-sm sm:text-base font-semibold text-white group-hover:text-gold">
+                          1323
+                        </span>
+                        <span className="text-xs sm:text-sm text-ink-muted group-hover:text-white/90">
+                          สายด่วนสุขภาพจิต (โทรฟรี 24 ชม.)
+                        </span>
+                      </div>
                     </a>
+
                     <a
                       href="tel:021136793"
-                      className="flex items-center gap-3 md:gap-4 text-gold-dim hover:text-gold transition-all duration-300 group"
+                      className="flex items-center gap-3 p-2 rounded-lg bg-white/[0.02] hover:bg-gold/10 text-gold-light hover:text-gold transition-all duration-200 group border border-transparent hover:border-gold/20"
                     >
-                      <div className="p-1.5 md:p-2 bg-gold/5 rounded-full group-hover:bg-gold/10">
+                      <div className="p-2 bg-gold/10 rounded-md text-gold">
                         <Phone size={16} />
                       </div>
-                      <span className="font-mono text-sm md:text-lg tracking-widest">
-                        02-113-6793 สะมาริตันส์
-                      </span>
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+                        <span className="font-mono text-sm sm:text-base font-semibold text-white group-hover:text-gold">
+                          02-113-6793
+                        </span>
+                        <span className="text-xs sm:text-sm text-ink-muted group-hover:text-white/90">
+                          สมาคมสะมาริตันส์แห่งประเทศไทย
+                        </span>
+                      </div>
                     </a>
                   </div>
                 </div>
+
                 <button
                   onClick={handleAccept}
-                  className="w-full py-4 md:py-5 bg-gold/10 hover:bg-gold/20 border border-gold/20 text-gold text-[10px] md:text-xs tracking-[0.3em] md:tracking-[0.4em] uppercase rounded-xl transition-all duration-700 font-mono"
+                  className="w-full py-3.5 sm:py-4 px-6 bg-gold/15 hover:bg-gold/25 border border-gold/30 hover:border-gold text-gold hover:text-gold-light text-xs sm:text-sm font-sans font-medium tracking-wide rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(200,169,110,0.15)] cursor-pointer"
                 >
-                  รับทราบและเข้าสู่ระบบจำลอง
+                  รับทราบและเข้าสู่การทบทวนชีวิต
                 </button>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      <style jsx global>{`
-        .animate-pulse-breathing {
-          animation: pulse-breathing 12s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes pulse-breathing {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
-        .animate-flicker {
-          animation: flicker 18s ease-in-out infinite;
-        }
-        @keyframes flicker {
-          0%, 100% { opacity: 0.2; }
-          50% { opacity: 0.1; }
-        }
-      `}</style>
     </div>
   );
 }

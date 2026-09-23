@@ -15,3 +15,9 @@ export interface User {
   name: string;
   age: number;
 }
+
+export interface UserAnswer {
+  step: number;
+  question: string;
+  answer: string;
+}

@@ -11,7 +11,7 @@ export default function SimulationPage() {
     name: string;
     age: number;
   } | null>(null);
-  const [filledYears, setFilledYears] = useState<number[]>([]);
+  const [filledYears, setFilledYears] = useState<number>(0);
 
   useEffect(() => {
     const data = localStorage.getItem("ci5m_user");
@@ -19,10 +19,15 @@ export default function SimulationPage() {
       router.push("/");
       return;
     }
-    setUserData(JSON.parse(data));
+    try {
+      setUserData(JSON.parse(data));
+    } catch {
+      router.push("/");
+      return;
+    }
 
-    const t1 = setTimeout(() => setScene(2), 7000); // เพิ่มเวลาให้คนได้อ่านบทกลอนหน่อย
-    const t2 = setTimeout(() => router.push("/select"), 16000);
+    const t1 = setTimeout(() => setScene(2), 6000);
+    const t2 = setTimeout(() => router.push("/select"), 26000);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
@@ -31,93 +36,109 @@ export default function SimulationPage() {
 
   useEffect(() => {
     if (scene === 2 && userData) {
-      let current = 0;
+      setFilledYears(0);
+      const target = Math.min(userData.age, 80);
+      let count = 0;
       const interval = setInterval(() => {
-        if (current < userData.age && current < 75) {
-          setFilledYears((prev) => [...prev, current]);
-          current++;
-        } else clearInterval(interval);
-      }, 60); // เร่งความเร็วการถมช่องนิดหนึ่งให้ดูสมูท
+        if (count < target) {
+          count++;
+          setFilledYears(count);
+        } else {
+          clearInterval(interval);
+        }
+      }, 45);
       return () => clearInterval(interval);
     }
   }, [scene, userData]);
 
   if (!userData) return null;
 
+  const currentAge = Math.min(userData.age, 80);
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-6 text-center bg-bg selection:bg-gold/30">
-      
+    <div className="relative flex flex-col items-center justify-center min-h-screen min-h-[100dvh] px-4 sm:px-6 py-10 text-center bg-bg selection:bg-gold/30 overflow-x-hidden">
       {/* 🌑 Background Fade Effect */}
-      <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_20%,black_140%)] opacity-80" />
+      <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_20%,black_140%)] opacity-85" />
 
       {scene === 1 ? (
-        <div className="relative z-10 space-y-12 animate-fade-in max-w-2xl">
-          <Hourglass
-            className="w-12 h-12 text-gold-dim animate-pulse mx-auto mb-8"
-            strokeWidth={1}
-          />
-          
+        <div className="relative z-10 space-y-8 md:space-y-10 animate-fade-in max-w-xl mx-auto w-full px-2">
+          <div className="flex justify-center">
+            <div className="p-4 bg-gold/5 rounded-full border border-gold/20 shadow-[0_0_25px_rgba(200,169,110,0.15)]">
+              <Hourglass
+                className="w-10 h-10 sm:w-12 sm:h-12 text-gold animate-pulse"
+                strokeWidth={1.2}
+              />
+            </div>
+          </div>
+
           {/* บทกลอน Scene 1: การสะท้อนสิ่งที่ผ่านมา */}
-          <div className="space-y-6 text-ink-muted font-serif italic mb-12">
-            <p className="text-xl md:text-2xl animate-fade-in [animation-delay:1s] fill-mode-both">
-              กาลเวลา... ไหลผ่านเงียบเชียบ
+          <div className="space-y-4 sm:space-y-5 text-ink-muted font-sans text-lg sm:text-xl md:text-2xl leading-relaxed">
+            <p className="animate-fade-in [animation-delay:0.8s] fill-mode-both">
+              กาลเวลา... ไหลผ่านไปอย่างเงียบเชียบ
             </p>
-            <p className="text-xl md:text-2xl animate-fade-in [animation-delay:2.5s] fill-mode-both">
-              ดั่งทรายในแก้ว... ที่ไม่มีวันหวนกลับ
+            <p className="animate-fade-in [animation-delay:2s] fill-mode-both">
+              ทุกเข็มนาฬิกาที่เดินผ่าน คือชีวิตที่ไม่มีวันหวนคืน
             </p>
           </div>
 
-          <div className="space-y-4 animate-fade-in [animation-delay:4.5s] fill-mode-both">
-             <h2 className="text-2xl md:text-4xl font-serif text-white/90">
-              คุณ {userData.name} ใช้ชีวิตมาแล้ว {userData.age} ปี
+          <div className="space-y-3 pt-4 sm:pt-6 animate-fade-in [animation-delay:3.5s] fill-mode-both">
+            <h2 className="text-xl sm:text-3xl md:text-4xl font-sans font-medium text-white/95 leading-snug">
+              คุณ <span className="text-gold font-semibold">{userData.name}</span> ใช้ชีวิตบนโลกมาแล้ว {userData.age} ปี
             </h2>
-            <h2 className="text-xl md:text-2xl font-serif text-gold-dim/70 tracking-widest uppercase">
-              ≈ {(userData.age * 365).toLocaleString()} วัน
-            </h2>
+            <p className="text-base sm:text-xl font-mono text-gold-dim tracking-widest">
+              ≈ {(userData.age * 365).toLocaleString()} วันที่ผ่านพ้น
+            </p>
           </div>
         </div>
       ) : (
-        <div className="relative z-10 animate-fade-in flex flex-col items-center w-full max-w-4xl">
-          
-          {/* Life Grid */}
-          <div className="grid grid-cols-15 gap-2 md:gap-3 mb-12 px-4">
-            {Array.from({ length: 80 }).map((_, i) => (
-              <div
-                key={i}
-                className={`w-3 h-3 md:w-5 md:h-5 rounded-[2px] transition-all duration-1000 border ${
-                  filledYears.includes(i) 
-                  ? "bg-gold border-gold scale-110 shadow-[0_0_15px_rgba(200,169,110,0.4)]" 
-                  : "border-border/40 bg-transparent"
-                }`}
-              />
-            ))}
+        <div className="relative z-10 animate-fade-in flex flex-col items-center w-full max-w-2xl mx-auto px-2">
+          {/* Life Grid (80 ปี) - 10 คอลัมน์ x 8 แถว = แถวละ 1 ทศวรรษ (10 ปี) */}
+          <div className="mb-4 p-4 sm:p-6 bg-surface/70 rounded-2xl border border-white/10 backdrop-blur-md max-w-fit mx-auto shadow-[0_0_40px_rgba(0,0,0,0.7)]">
+            <div className="grid-cols-10 gap-2 sm:gap-2.5 md:gap-3">
+              {Array.from({ length: 80 }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 rounded-[4px] transition-all duration-500 border ${i < filledYears
+                      ? "bg-gold border-gold-light scale-105 shadow-[0_0_12px_rgba(200,169,110,0.55)]"
+                      : "border-white/10 bg-white/[0.02]"
+                    }`}
+                  title={`ปีที่ ${i + 1}`}
+                />
+              ))}
+            </div>
           </div>
 
-          <p className="text-ink-faint font-mono text-[15px] tracking-[0.4em] uppercase mb-16 opacity-50">
-            1 ช่องสีทอง = 1 ปีที่เลือนหาย 
-          </p>
+          <div className="space-y-1 mb-8 sm:mb-10 text-center">
+            <p className="text-gold-light/90 font-mono text-xs sm:text-sm tracking-wider uppercase">
+              1 แถว = 10 ปี (1 ทศวรรษ) • สีทอง = {currentAge} ปีที่คุณได้ใช้ไปแล้ว
+            </p>
+
+          </div>
 
           {/* บทกลอน Scene 2: การตั้งคำถามถึงสิ่งที่เหลือ */}
-          <div className="space-y-8 text-white/90 font-serif italic mb-8">
-            <p className="text-xl md:text-2xl animate-fade-in [animation-delay:1s] fill-mode-both">
-              แต่ละช่องที่ว่างเปล่า... คือโอกาสที่ยังเหลือ
+          <div className="space-y-4 sm:space-y-5 text-white/90 font-sans leading-relaxed max-w-xl mx-auto px-2">
+            <p className="text-base sm:text-xl animate-fade-in [animation-delay:0.8s] fill-mode-both text-ink-muted">
+              แต่ละช่องที่ยังว่างเปล่า... คือเวลาที่คุณอาจไม่มีโอกาสได้ใช้อีกต่อไป
             </p>
-            <p className="text-xl md:text-2xl animate-fade-in [animation-delay:3s] fill-mode-both text-gold-dim">
-              หากนี่คือ... วันที่คุณได้จากโลกนี้ไปแล้ว
+            <p className="text-base sm:text-xl animate-fade-in [animation-delay:2s] fill-mode-both text-gold-light/90">
+              สมมติว่า... นี่คือวันที่คุณได้จากโลกนี้ไปแล้วจริงๆ
             </p>
-            <p className="text-2xl md:text-3xl font-serif not-italic font-light animate-fade-in [animation-delay:5s] fill-mode-both pt-4">
-              คุณเสียดายชีวิตที่เหลือไหม?... และถ้าคุณมีโอกาสได้กลับมา5นาที คุณอยากจะทำอะไร?
+            <p className="text-lg sm:text-2xl font-sans font-medium text-white animate-fade-in [animation-delay:3.5s] fill-mode-both pt-2 leading-relaxed">
+              คุณเสียดายชีวิตที่เหลืออยู่ไหม?... <br className="hidden sm:inline" />
+              และหากมีโอกาสส่งเสียงกลับมาได้อีกเพียง 5 นาที คุณอยากจะพูดอะไรกับใคร?
             </p>
           </div>
+
+          {/* ปุ่มก้าวสู่ขั้นตอนถัดไป */}
+          <button
+            onClick={() => router.push("/select")}
+            className="mt-8 sm:mt-10 px-6 py-2.5 bg-gold/10 hover:bg-gold/20 border border-gold/30 hover:border-gold text-gold hover:text-gold-light text-xs sm:text-sm font-sans font-medium rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(200,169,110,0.1)] cursor-pointer flex items-center gap-2 group"
+          >
+            <span>ก้าวสู่การเลือกหัวข้อ</span>
+            <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+          </button>
         </div>
       )}
-
-      <style jsx global>{`
-        .grid-cols-15 { 
-          display: grid;
-          grid-template-columns: repeat(15, minmax(0, 1fr)); 
-        }
-      `}</style>
     </div>
   );
 }
