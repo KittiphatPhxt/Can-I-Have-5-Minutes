@@ -54,13 +54,17 @@ export default function MemorialLetterModal({
         answersContainer.style.overflow = "visible";
       }
 
-      // Small delay to allow layout recalculation
+      // Ensure web fonts are fully rendered in the browser before capture
+      if (document.fonts) {
+        await document.fonts.ready;
+      }
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       const dataUrl = await toPng(cardRef.current, {
         pixelRatio: 2,
         backgroundColor: "#0d0d10",
         cacheBust: true,
+        skipFonts: true, // Prevents SecurityError on cross-origin Google Fonts stylesheets
       });
 
       const fileName = `จดหมายถึงโลกใบเดิม-${user?.name || "บันทึก"}.png`;
