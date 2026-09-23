@@ -16,6 +16,12 @@ export default function IntroPage() {
 
   const [isAccepted, setIsAccepted] = useState(false);
   const [showWarning, setShowWarning] = useState(true);
+  const [roastData, setRoastData] = useState<{
+    badge: string;
+    title: string;
+    message: string;
+    icon: string;
+  } | null>(null);
 
   const handleAccept = () => {
     setShowWarning(false);
@@ -28,13 +34,50 @@ export default function IntroPage() {
       setStep(2);
     } else if (step === 2 && age.trim()) {
       const ageNum = parseInt(age, 10);
-      if (!isNaN(ageNum) && ageNum > 0) {
-        localStorage.setItem(
-          "ci5m_user",
-          JSON.stringify({ name: name.trim(), age: ageNum })
-        );
-        router.push("/simulation");
+      if (isNaN(ageNum)) return;
+
+      if (ageNum <= 0) {
+        setRoastData({
+          icon: "🍼",
+          badge: "ตรวจพบสถานะ: ยังอยู่ในครรภ์มารดา",
+          title: "เอิ่ม... คุณโยมยังไม่คลอดเหรอครับ?",
+          message:
+            "ระบบจำลองชีวิตนี้ออกแบบมาสำหรับผู้ที่ลืมตาดูโลกแล้วครับผม กรุณารอคลอดและใช้ชีวิตสักนิดก่อนค่อยมากดเล่นนะจ๊ะ 👶",
+        });
+        return;
       }
+
+      if (ageNum > 80) {
+        if (ageNum >= 500) {
+          setRoastData({
+            icon: "🦖",
+            badge: "ตรวจพบสิ่งมีชีวิต: ยุคจูราสสิก / ฟอสซิลเดินได้",
+            title: "กราบเรียนท่านไดโนเสาร์พันปี...",
+            message: `กรอกมาได้ตั้ง ${ageNum} ปี! ท่านน่าจะผ่านยุคอุกกาบาตชนโลกและสร้างพีระมิดมาด้วยตัวเองใช่ไหมครับ? เว็บนี้จำลองชีวิตมนุษย์เดินดินธรรมดา (สูงสุด 80 ปี) รบกวนท่านผู้อาวุโสข้ามมิติกรอกอายุคนปกติด้วยครับผม 🙏`,
+          });
+        } else if (ageNum >= 100) {
+          setRoastData({
+            icon: "👻",
+            badge: "ตรวจพบสถานะ: วิญญาณบรรพบุรุษข้ามภพภูมิ",
+            title: "โอ้โห... ยมบาลปล่อยสัญญาณเน็ตให้เหรอครับ?",
+            message: `อายุ ${ageNum} ปีเนี่ย ป่านนี้ลูกหลานน่าจะจุดธูปเรียกไปกินข้าวแล้วครับ เกรียนเก่งขนาดนี้แสดงว่าวิญญาณยังแข็งแรงแจ่มใสดีมาก รบกวนกรอกอายุขัยปัจจุบันที่ยังไม่ข้ามมิติโลกวิญญาณด้วยครับคุณพี่ 🪦`,
+          });
+        } else {
+          setRoastData({
+            icon: "🧓",
+            badge: "ตรวจพบสถานะ: เกินขอบเขตมนุษย์จำลอง (Max 80 ปี)",
+            title: "ขอประทานอภัยเป็นอย่างสูงครับคุณพี่...",
+            message: `ตารางชีวิตของเราจำลองไว้สูงสุดที่ 80 ปีตามค่าเฉลี่ยมนุษย์โลกครับ หากท่านอายุ ${ageNum} ปีจริง ป่านนี้ลูกหลานคงพาไปสวดมนต์เข้าวัดแล้ว ไม่น่าจะมานั่งไถมือถือเกรียนใส่เว็บเล่นแบบนี้ รบกวนกรอกอายุจริง (1 - 80 ปี) สักนิดเถอะครับ 5555 📿`,
+          });
+        }
+        return;
+      }
+
+      localStorage.setItem(
+        "ci5m_user",
+        JSON.stringify({ name: name.trim(), age: ageNum })
+      );
+      router.push("/simulation");
     }
   };
 
@@ -155,8 +198,6 @@ export default function IntroPage() {
                       onChange={(e) => setAge(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleNext()}
                       placeholder="ระบุอายุของคุณ เช่น 25"
-                      min="1"
-                      max="120"
                       className="w-full bg-surface/50 border-b border-white/20 focus:border-gold focus:bg-surface/80 focus:outline-none py-3 px-4 text-base sm:text-lg text-center transition-all duration-300 font-sans text-white placeholder:text-ink-faint/50 rounded-t-lg"
                     />
                   </motion.div>
@@ -256,6 +297,55 @@ export default function IntroPage() {
                   className="w-full py-3.5 sm:py-4 px-6 bg-gold/15 hover:bg-gold/25 border border-gold/30 hover:border-gold text-gold hover:text-gold-light text-xs sm:text-sm font-sans font-medium tracking-wide rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(200,169,110,0.15)] cursor-pointer"
                 >
                   รับทราบและเข้าสู่การทบทวนชีวิต
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 🤡 Roast Modal สำหรับคนเกรียนกรอกอายุเกิน 80 */}
+      <AnimatePresence>
+        {roastData && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[150] flex items-center justify-center p-4 sm:p-6 bg-black/90 backdrop-blur-md overflow-hidden"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.85, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: "spring", damping: 20, stiffness: 300 }}
+              className="bg-[#121217] border-2 border-amber-500/60 rounded-3xl max-w-md w-full relative shadow-[0_0_80px_rgba(245,158,11,0.25)] p-6 sm:p-8 text-center space-y-4 my-auto font-sans"
+            >
+              <div className="text-5xl sm:text-6xl animate-bounce pt-2">
+                {roastData.icon}
+              </div>
+
+              <div className="space-y-1">
+                <span className="inline-block px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-[10px] sm:text-xs font-mono text-amber-300">
+                  {roastData.badge}
+                </span>
+                <h3 className="text-lg sm:text-xl font-medium text-white pt-2">
+                  {roastData.title}
+                </h3>
+              </div>
+
+              <p className="text-xs sm:text-sm text-ink-muted leading-relaxed px-1">
+                {roastData.message}
+              </p>
+
+              <div className="pt-3">
+                <button
+                  onClick={() => {
+                    setRoastData(null);
+                    setAge("");
+                  }}
+                  className="w-full py-3 px-5 rounded-full bg-gradient-to-r from-amber-500/25 via-gold/30 to-amber-500/25 hover:from-amber-500/35 hover:to-gold/40 border border-gold/50 text-gold-light hover:text-white text-xs sm:text-sm font-sans font-medium transition-all duration-300 shadow-[0_0_25px_rgba(200,169,110,0.2)] cursor-pointer"
+                >
+                  กราบขออภัยครับ... จะยอมกรอกอายุจริงดีๆ แล้ว 🥺
                 </button>
               </div>
             </motion.div>
