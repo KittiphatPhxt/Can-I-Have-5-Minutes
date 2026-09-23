@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Download, Copy, Check, Sparkles, Scroll, Heart } from "lucide-react";
-import html2canvas from "html2canvas";
+import { toPng } from "html-to-image";
 import { UserAnswer, Theme, User } from "../types";
 
 interface MemorialLetterModalProps {
@@ -37,22 +37,74 @@ export default function MemorialLetterModal({
 
   const handleDownload = async () => {
     if (!cardRef.current || isDownloading) return;
+    setIsDownloading(true);
+
+    const answersContainer =
+      cardRef.current.querySelector<HTMLElement>(".answers-scroll-area");
+    const originalMaxHeight = answersContainer
+      ? answersContainer.style.maxHeight
+      : "";
+    const originalOverflow = answersContainer
+      ? answersContainer.style.overflow
+      : "";
+
     try {
-      setIsDownloading(true);
-      const canvas = await html2canvas(cardRef.current, {
-        scale: 2, // High resolution
-        useCORS: true,
-        backgroundColor: "#0a0a0c",
-        logging: false,
+      if (answersContainer) {
+        answersContainer.style.maxHeight = "none";
+        answersContainer.style.overflow = "visible";
+      }
+
+      // Small delay to allow layout recalculation
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      const dataUrl = await toPng(cardRef.current, {
+        pixelRatio: 2,
+        backgroundColor: "#0d0d10",
+        cacheBust: true,
       });
-      const dataUrl = canvas.toDataURL("image/png");
+
+      const fileName = `จดหมายถึงโลกใบเดิม-${user?.name || "บันทึก"}.png`;
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
+
+      // Mobile Web Share API support
+      const file = new File([blob], fileName, { type: "image/png" });
+      if (
+        typeof navigator !== "undefined" &&
+        navigator.canShare &&
+        navigator.canShare({ files: [file] })
+      ) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: "จดหมายถึงโลกใบเดิม",
+            text: "ถ้อยคำสุดท้ายในห้วงเวลาจำลอง 5 นาทีก่อนจากลา — Can I Have 5 Minutes",
+          });
+          return;
+        } catch (shareErr) {
+          if ((shareErr as Error).name === "AbortError") {
+            return;
+          }
+        }
+      }
+
+      // Standard desktop download fallback
+      const blobUrl = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.download = `จดหมายถึงโลกใบเดิม-${user?.name || "บันทึก"}.png`;
-      link.href = dataUrl;
+      link.download = fileName;
+      link.href = blobUrl;
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 3000);
     } catch (err) {
       console.error("Failed to generate image", err);
+      alert("ไม่สามารถสร้างรูปภาพได้ในขณะนี้ กรุณาใช้ปุ่มคัดลอกข้อความแทนครับ");
     } finally {
+      if (answersContainer) {
+        answersContainer.style.maxHeight = originalMaxHeight;
+        answersContainer.style.overflow = originalOverflow;
+      }
       setIsDownloading(false);
     }
   };
@@ -162,7 +214,7 @@ ${answers
               </div>
 
               {/* Answers Body */}
-              <div className="space-y-2.5 max-h-[35dvh] overflow-y-auto pr-1 text-left">
+              <div className="answers-scroll-area space-y-2.5 max-h-[35dvh] overflow-y-auto pr-1 text-left">
                 {answers.map((item, idx) => (
                   <div key={idx} className="space-y-1 bg-white/[0.02] p-2.5 sm:p-3 rounded-lg border border-white/5">
                     <p className="text-[11px] sm:text-xs text-gold-light/90 font-medium leading-snug">
